@@ -14,30 +14,38 @@ public class BookController {
     private BookService bookService;
 
     @PostMapping
-    public boolean save(@RequestBody Book book) {
-        bookService.save(book);
-        return true;
+    public Result save(@RequestBody Book book) {
+        boolean fg = bookService.save(book);
+        return new Result(fg,fg? Code.SAVE_OK:Code.SAVE_ERR);
     }
 
     @PutMapping
-    public boolean update(@RequestBody Book book) {
-        bookService.update(book);
-        return true;
+    public Result update(@RequestBody Book book) {
+        boolean fg = bookService.update(book);
+        return new Result(fg,fg? Code.UPDATE_OK:Code.UPDATE_ERR);
     }
 
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable Integer id) {
-        bookService.delete(id);
-        return true;
+    public Result delete(@PathVariable Integer id) {
+        boolean fg = bookService.delete(id);
+        return new Result(fg,fg? Code.DELETE_OK:Code.DELETE_ERR);
     }
 
     @GetMapping("/{id}")
-    public Book getById(@PathVariable Integer id) {
-        return bookService.getById(id);
+    public Result getById(@PathVariable Integer id) {
+        Book book = bookService.getById(id);
+        if (book == null){
+            return new Result(Code.GET_ERR,"查询失败，请重试");
+        }
+        return new Result(book,Code.GET_OK);
     }
 
     @GetMapping
-    public List<Book> getAll() {
-        return bookService.getAll();
+    public Result getAll() {
+        List<Book> all = bookService.getAll();
+        if (all == null || all.isEmpty()){
+            return new Result(Code.GET_ERR,"查询失败，请重试");
+        }
+        return new Result(all,Code.GET_OK);
     }
 }
